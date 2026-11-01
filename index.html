@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wichtel-Werkstatt</title>
+<style>
+:root{--bg:#fbf4e6;--card:#fffdf8;--ink:#2b1a1a;--mute:#7a6a64;--red:#b3201f;--red2:#8e1514;--green:#1f6b3a;--gold:#c9962b;--line:#e8d9bd;--snow:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f2a1c;--card:#16382a;--ink:#fdf3e1;--mute:#b9c9b8;--red:#e0453f;--red2:#c23430;--green:#4fb374;--gold:#f0c050;--line:#2a5440;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f2a1c;--card:#16382a;--ink:#fdf3e1;--mute:#b9c9b8;--red:#e0453f;--red2:#c23430;--green:#4fb374;--gold:#f0c050;--line:#2a5440;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.5;min-height:100vh;overflow-x:hidden}
+.snow{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.snow i{position:absolute;top:-10px;color:var(--gold);opacity:.55;animation:fall linear infinite;font-style:normal}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.snow{display:none}}
+main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:18px 16px 40px}
+header{text-align:center;padding:10px 0 6px}
+h1{font-size:2rem;margin:.2em 0;color:var(--red)}
+header p{margin:0;color:var(--mute)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+label{font-weight:bold;display:block;margin-bottom:6px}
+textarea,input[type=text]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px}
+textarea{min-height:150px;resize:vertical}
+small,.hint{color:var(--mute);font-size:.88rem}
+button,.btn{font:inherit;font-weight:bold;cursor:pointer;border:0;border-radius:999px;padding:11px 20px;background:var(--red);color:#fff;text-decoration:none;display:inline-block}
+button:hover,.btn:hover{background:var(--red2)}
+button.alt,.btn.alt{background:var(--green)}
+button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border-bottom:0}
+.row b{flex:1 1 100px;word-break:break-word}
+.row .acts{display:flex;gap:6px;flex-wrap:wrap}
+.row button,.row .btn{padding:7px 14px;font-size:.85rem}
+.err{color:var(--red);font-weight:bold;margin:8px 0 0}
+.warn{background:rgba(201,150,43,.15);border-left:4px solid var(--gold);padding:10px 12px;border-radius:8px;margin:12px 0;font-size:.92rem}
+.gift{text-align:center;padding:10px 0}
+.box{font-size:6rem;cursor:pointer;user-select:none;display:inline-block;animation:wob 1.6s ease-in-out infinite;background:none;border:0;padding:0;color:inherit}
+.box:hover{background:none}
+@keyframes wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.name{font-size:2.4rem;font-weight:bold;color:var(--green);word-break:break-word;margin:.2em 0;animation:pop .6s ease}
+@keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.hide{display:none!important}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 18px;border-radius:999px;z-index:5;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="snow" id="snow" aria-hidden="true"></div>
+<main>
+<header>
+  <div style="font-size:2.6rem">🎄🎅🎁</div>
+  <h1>Wichtel-Werkstatt</h1>
+  <p>Wer beschenkt wen? Streng geheim ausgelost.</p>
+</header>
+
+<!-- Organisator -->
+<section id="setup">
+  <div class="card" id="inputCard">
+    <label for="names">Teilnehmer (ein Name pro Zeile)</label>
+    <textarea id="names" placeholder="Anna&#10;Ben&#10;Clara&#10;David"></textarea>
+    <p class="hint" id="count">0 Teilnehmer · mindestens 3 nötig</p>
+    <button id="go">🎲 Auslosen</button>
+    <p class="err" id="err"></p>
+  </div>
+
+  <div class="card hide" id="resCard">
+    <h2 style="margin-top:0;color:var(--green)">✅ Ausgelost!</h2>
+    <div class="warn">🤫 Öffne die Links nicht selbst, außer deinen eigenen. Jeder Link verrät nur, wen <b>diese eine Person</b> beschenkt. Niemand sonst sieht etwas.</div>
+    <label for="base">Adresse dieser Seite</label>
+    <input type="text" id="base" autocomplete="off">
+    <p class="hint">Wichtig: Teile diese Seite zuvor über „Teilen“ → Link, damit deine Mitwichtel sie öffnen können.</p>
+    <div id="list"></div>
+    <p style="margin-bottom:0"><button id="copyAll" class="alt">📋 Alle Links kopieren</button> <button id="again" class="ghost">Neu auslosen</button></p>
+  </div>
+</section>
+
+<!-- Teilnehmer -->
+<section id="reveal" class="hide">
+  <div class="card gift">
+    <p id="hello" style="font-size:1.2rem;margin-top:0"></p>
+    <div id="closed">
+      <button class="box" id="box" aria-label="Geschenk öffnen">🎁</button>
+      <p class="hint">Tippe auf das Geschenk, um zu sehen, wen du beschenkst.</p>
+    </div>
+    <div id="opened" class="hide">
+      <p style="margin:0">Du beschenkst:</p>
+      <div class="name" id="who"></div>
+      <p>🤫 Pssst! Verrate es niemandem.</p>
+    </div>
+    <p class="err hide" id="bad">Dieser Link ist leider ungültig. Bitte frage den Organisator nach einem neuen Link.</p>
+  </div>
+  <p style="text-align:center"><a href="#" id="own" class="hint">Eigene Wichtelrunde starten</a></p>
+</section>
+</main>
+<div class="toast hide" id="toast"></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var SEP="\u0001", pairs=[];
+
+  /* Schneeflocken */
+  var s=$("snow");
+  for(var i=0;i<22;i++){var f=document.createElement("i");f.textContent=i%3?"❄":"✦";
+    f.style.left=Math.random()*100+"%";f.style.fontSize=(10+Math.random()*16)+"px";
+    f.style.animationDuration=(8+Math.random()*10)+"s";f.style.animationDelay=(-Math.random()*14)+"s";s.appendChild(f)}
+
+  function rnd(n){ /* gleichmäßige Zufallszahl 0..n-1 */
+    var max=Math.floor(4294967296/n)*n,a=new Uint32Array(1);
+    do{crypto.getRandomValues(a)}while(a[0]>=max);
+    return a[0]%n;
+  }
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t}return a}
+
+  function parse(){
+    var raw=$("names").value.split(/[\n;,]+/),out=[],seen={};
+    raw.forEach(function(x){
+      x=x.replace(/[\u0000-\u001f]/g,"").replace(/\s+/g," ").trim();
+      if(x)out.push(x);
+    });
+    return out;
+  }
+  $("names").addEventListener("input",function(){
+    var n=parse().length;$("count").textContent=n+" Teilnehmer"+(n<3?" · mindestens 3 nötig":"");
+  });
+
+  /* Token: Hex-Zeichen, damit der Link mit #name funktioniert */
+  function hex(n){return ("0"+n.toString(16)).slice(-2)}
+  function enc(giver,recv){
+    var b=new TextEncoder().encode(giver+SEP+recv),k=1+rnd(255),o=hex(k);
+    for(var i=0;i<b.length;i++)o+=hex(b[i]^k);
+    return o;
+  }
+  function dec(t){
+    if(!/^([0-9a-f]{2}){3,}$/.test(t))return null;
+    var k=parseInt(t.slice(0,2),16),b=[];
+    for(var i=2;i<t.length;i+=2)b.push(parseInt(t.substr(i,2),16)^k);
+    try{var p=new TextDecoder("utf-8",{fatal:true}).decode(new Uint8Array(b)).split(SEP);
+      return p.length===2&&p[0]&&p[1]?p:null}catch(e){return null}
+  }
+
+  function draw(){
+    var names=parse(),err=$("err");err.textContent="";
+    if(names.length<3){err.textContent="Bitte mindestens 3 Teilnehmer eintragen.";return}
+    var low={};
+    for(var i=0;i<names.length;i++){var l=names[i].toLowerCase();
+      if(low[l]){err.textContent="„"+names[i]+"“ kommt doppelt vor. Bitte unterscheide die Namen (z. B. „Anna M.“ und „Anna K.“).";return}
+      low[l]=1}
+    /* Zufälliger Ring: jeder beschenkt den Nächsten → niemand sich selbst, jeder genau einmal beschenkt */
+    var ring=shuffle(names);pairs=[];
+    for(var j=0;j<ring.length;j++)pairs.push({giver:ring[j],recv:ring[(j+1)%ring.length]});
+    pairs.sort(function(a,b){return a.giver.localeCompare(b.giver,"de")});
+    pairs.forEach(function(p){p.tok=enc(p.giver,p.recv)});
+    $("inputCard").classList.add("hide");$("resCard").classList.remove("hide");
+    renderList();
+  }
+  function base(){return $("base").value.trim().replace(/#.*$/,"")}
+  function link(p){return base()+"#"+p.tok}
+  function msg(p){return "🎅 Hallo "+p.giver+"! Hier erfährst du, wen du beim Wichteln beschenkst (psst, geheim halten!): "+link(p)}
+
+  function renderList(){
+    var L=$("list");L.textContent="";
+    pairs.forEach(function(p,idx){
+      var r=document.createElement("div");r.className="row";
+      var n=document.createElement("b");n.textContent="🎁 "+p.giver;
+      var a=document.createElement("div");a.className="acts";
+      var c=document.createElement("button");c.textContent="Link kopieren";c.onclick=function(){copy(link(p),"Link für "+p.giver+" kopiert")};
+      var w=document.createElement("a");w.className="btn alt";w.textContent="WhatsApp";w.target="_blank";w.rel="noopener";
+      w.href="https://wa.me/?text="+encodeURIComponent(msg(p));
+      a.appendChild(c);a.appendChild(w);r.appendChild(n);r.appendChild(a);L.appendChild(r);
+    });
+  }
+  $("base").addEventListener("input",function(){if(pairs.length)renderList()});
+  $("copyAll").onclick=function(){
+    copy(pairs.map(function(p){return p.giver+": "+link(p)}).join("\n"),"Alle Links kopiert");
+  };
+  $("again").onclick=function(){pairs=[];$("resCard").classList.add("hide");$("inputCard").classList.remove("hide")};
+  $("go").onclick=draw;
+
+  function toast(t){var e=$("toast");e.textContent=t;e.classList.remove("hide");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.add("hide")},2200)}
+  function copy(text,ok){
+    function fb(){
+      var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+      document.body.appendChild(ta);ta.select();var good=false;
+      try{good=document.execCommand("copy")}catch(e){}
+      document.body.removeChild(ta);
+      toast(good?ok:"Kopieren nicht möglich – bitte Link manuell markieren");
+    }
+    try{navigator.clipboard.writeText(text).then(function(){toast(ok)},fb)}catch(e){fb()}
+  }
+
+  /* Ansicht wählen */
+  function route(){
+    var h=location.hash.replace(/^#/,"");
+    if(!h){$("setup").classList.remove("hide");$("reveal").classList.add("hide");return}
+    $("setup").classList.add("hide");$("reveal").classList.remove("hide");
+    var p=dec(h);
+    $("closed").classList.remove("hide");$("opened").classList.add("hide");
+    if(!p){$("hello").textContent="";$("closed").classList.add("hide");$("bad").classList.remove("hide");return}
+    $("bad").classList.add("hide");
+    $("hello").textContent="Frohe Weihnachten, "+p[0]+"! 🎄";
+    $("who").textContent=p[1];
+  }
+  $("box").onclick=function(){$("closed").classList.add("hide");$("opened").classList.remove("hide")};
+  $("own").onclick=function(e){e.preventDefault();location.hash="";route()};
+  window.addEventListener("hashchange",route);
+
+  try{if(/^https?:/.test(location.href))$("base").value=location.href.replace(/#.*$/,"")}catch(e){}
+  route();
+})();
+</script>
+</body>
+</html>
