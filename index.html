@@ -5,248 +5,354 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Wichtel-Werkstatt</title>
 <style>
-:root{--bg:#fbf4e6;--card:#fffdf8;--ink:#2b1a1a;--mute:#7a6a64;--red:#b3201f;--red2:#8e1514;--green:#1f6b3a;--gold:#c9962b;--line:#e8d9bd;--snow:#fff;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f2a1c;--card:#16382a;--ink:#fdf3e1;--mute:#b9c9b8;--red:#e0453f;--red2:#c23430;--green:#4fb374;--gold:#f0c050;--line:#2a5440;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f2a1c;--card:#16382a;--ink:#fdf3e1;--mute:#b9c9b8;--red:#e0453f;--red2:#c23430;--green:#4fb374;--gold:#f0c050;--line:#2a5440;color-scheme:dark}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{--bg1:#fff6e8;--bg2:#fbdcd6;--card:rgba(255,255,255,.78);--ink:#25161a;--mute:#6f5a5e;--red:#d12c3a;--red2:#b01c2b;--green:#12804a;--gold:#e2a41f;--line:rgba(37,22,26,.12);--in:#fff;color-scheme:light;
+--f:ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg1:#0a2a1d;--bg2:#3b0f18;--card:rgba(255,255,255,.07);--ink:#fff5e8;--mute:#bccbc0;--red:#ff5c62;--red2:#ea444b;--green:#55d68c;--gold:#ffd060;--line:rgba(255,255,255,.15);--in:rgba(255,255,255,.08);color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.5;min-height:100vh;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;font-family:var(--f);color:var(--ink);line-height:1.5;background:linear-gradient(155deg,var(--bg1),var(--bg2)) fixed;overflow-x:hidden}
 .snow{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.snow i{position:absolute;top:-10px;color:var(--gold);opacity:.55;animation:fall linear infinite;font-style:normal}
-@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.snow{display:none}}
-main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:18px 16px 40px}
-header{text-align:center;padding:10px 0 6px}
-h1{font-size:2rem;margin:.2em 0;color:var(--red)}
+.snow i{position:absolute;top:-20px;color:#fff;opacity:.7;font-style:normal;animation:fall linear infinite;text-shadow:0 0 6px rgba(0,0,0,.15)}
+@keyframes fall{to{transform:translate3d(30px,110vh,0) rotate(300deg)}}
+.lights{position:relative;z-index:1;height:14px;background:radial-gradient(circle,var(--red) 0 3.5px,transparent 4.5px) 0 4px/46px 14px,radial-gradient(circle,var(--gold) 0 3.5px,transparent 4.5px) 23px 4px/46px 14px,radial-gradient(circle,var(--green) 0 3.5px,transparent 4.5px) 11px 4px/46px 14px;animation:tw 2.4s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.55}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.snow{display:none}*{animation:none!important}}
+main{position:relative;z-index:1;max-width:580px;margin:0 auto;padding:22px 16px 28px}
+header{text-align:center}
+header svg{width:58px;height:58px}
+h1{font-size:clamp(1.9rem,7vw,2.5rem);letter-spacing:-.03em;margin:6px 0 2px;line-height:1.1;background:linear-gradient(90deg,var(--red),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 header p{margin:0;color:var(--mute)}
-.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
-label{font-weight:bold;display:block;margin-bottom:6px}
-textarea,input[type=text]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px}
-textarea{min-height:150px;resize:vertical}
-small,.hint{color:var(--mute);font-size:.88rem}
-button,.btn{font:inherit;font-weight:bold;cursor:pointer;border:0;border-radius:999px;padding:11px 20px;background:var(--red);color:#fff;text-decoration:none;display:inline-block}
-button:hover,.btn:hover{background:var(--red2)}
-button.alt,.btn.alt{background:var(--green)}
-button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)}
-.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 0;border-bottom:1px dashed var(--line)}
-.row:last-child{border-bottom:0}
-.row b{flex:1 1 100px;word-break:break-word}
-.row .acts{display:flex;gap:6px;flex-wrap:wrap}
-.row button,.row .btn{padding:7px 14px;font-size:.85rem}
-.err{color:var(--red);font-weight:bold;margin:8px 0 0}
-.warn{background:rgba(201,150,43,.15);border-left:4px solid var(--gold);padding:10px 12px;border-radius:8px;margin:12px 0;font-size:.92rem}
-.gift{text-align:center;padding:10px 0}
-.box{font-size:6rem;cursor:pointer;user-select:none;display:inline-block;animation:wob 1.6s ease-in-out infinite;background:none;border:0;padding:0;color:inherit}
-.box:hover{background:none}
-@keyframes wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
-.name{font-size:2.4rem;font-weight:bold;color:var(--green);word-break:break-word;margin:.2em 0;animation:pop .6s ease}
-@keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
-.addrow{display:flex;gap:8px}.addrow input{flex:1;min-width:0}.addrow button{white-space:nowrap;padding:10px 16px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;min-height:8px}
-.chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:2px solid var(--green);border-radius:999px;padding:4px 6px 4px 12px;font-weight:bold;animation:pop .3s ease;max-width:100%}
+.steps{display:flex;gap:6px;list-style:none;padding:0;margin:18px 0 0;counter-reset:s}
+.steps li{flex:1;text-align:center;font-size:.8rem;font-weight:600;padding:7px 4px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--mute);counter-increment:s;transition:.25s}
+.steps li:before{content:counter(s)" · "}
+.steps li.on{background:var(--red);color:#fff;border-color:transparent;transform:scale(1.04)}
+.card{background:var(--card);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:24px;padding:20px;margin-top:16px;box-shadow:0 12px 40px rgba(0,0,0,.12)}
+h2{margin:0 0 6px;font-size:1.25rem}
+label{font-weight:600;font-size:.92rem;display:block;margin:0 0 6px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;outline:0;transition:.15s}
+input:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(209,44,58,.15)}
+button,.btn{font:inherit;font-weight:650;cursor:pointer;border:0;border-radius:14px;padding:12px 18px;background:var(--red);color:#fff;text-decoration:none;display:inline-block;text-align:center;transition:.15s}
+button:hover,.btn:hover{background:var(--red2);transform:translateY(-1px)}
+button:active{transform:scale(.97)}
+.big{width:100%;padding:15px;font-size:1.05rem;margin-top:14px;background:linear-gradient(90deg,var(--red),#e9593f);box-shadow:0 8px 22px rgba(209,44,58,.35)}
+.alt{background:var(--green);color:#fff}
+.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.ghost:hover{background:var(--in)}
+.hint{color:var(--mute);font-size:.85rem;margin:6px 0}
+.addrow{display:flex;gap:8px}.addrow input{flex:1;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 2px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--in);border:1.5px solid var(--line);border-radius:999px;padding:4px 5px 4px 13px;font-weight:600;animation:pop .3s ease;max-width:100%}
 .chip span{word-break:break-word}
-.chip button{background:var(--red);padding:0;width:24px;height:24px;line-height:22px;font-size:.9rem;flex:none}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-@media (max-width:420px){.two{grid-template-columns:1fr}}
-.two label{font-size:.92rem}
-.info{margin:10px auto 4px;display:inline-block;text-align:left;background:rgba(201,150,43,.15);border-radius:12px;padding:8px 16px}
+.chip button{background:var(--line);color:var(--ink);padding:0;width:24px;height:24px;line-height:24px;border-radius:50%;font-size:.75rem}
+.chip button:hover{background:var(--red);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid .full{grid-column:1/-1}
+@media (max-width:440px){.grid{grid-template-columns:1fr}}
+details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+.exrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:10px}
+@media (max-width:440px){.exrow{grid-template-columns:1fr 1fr}.exrow button{grid-column:1/-1}}
+.err{color:var(--red);font-weight:600;font-size:.92rem;margin:8px 0 0;min-height:1px}
+.warn{background:rgba(226,164,31,.16);border-radius:14px;padding:10px 14px;margin:12px 0;font-size:.9rem}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}.row b{flex:1 1 90px;word-break:break-word}
+.row .acts{display:flex;gap:6px}.row .btn,.row button{padding:8px 14px;font-size:.85rem}
+.acts2{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.stage{text-align:center;padding:8px 0}
+.gift{font-size:6.5rem;line-height:1;background:none;padding:0;animation:wob 1.8s ease-in-out infinite;filter:drop-shadow(0 10px 14px rgba(0,0,0,.25))}
+.gift:hover{background:none;transform:scale(1.06)}
+@keyframes wob{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.who{font-size:clamp(2rem,9vw,2.8rem);font-weight:800;letter-spacing:-.02em;margin:6px 0 10px;word-break:break-word;background:linear-gradient(90deg,var(--green),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;min-height:1.2em}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.facts{display:grid;gap:8px;margin:14px 0;text-align:left}
+.fact{background:var(--in);border:1px solid var(--line);border-radius:16px;padding:10px 14px}
+.fact small{display:block;color:var(--mute)}
+.count{font-weight:700;color:var(--red)}
 .hide{display:none!important}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 18px;border-radius:999px;z-index:5;font-weight:bold}
+.foot{text-align:center;color:var(--mute);font-size:.8rem;margin-top:22px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg1);padding:10px 18px;border-radius:999px;z-index:30;font-weight:600;font-size:.9rem}
+canvas#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
 </style>
 </head>
 <body>
 <div class="snow" id="snow" aria-hidden="true"></div>
+<div class="lights" aria-hidden="true"></div>
+<canvas id="cf" aria-hidden="true"></canvas>
 <main>
 <header>
-  <div style="font-size:2.6rem">🎄🎅🎁</div>
+  <svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="32,4 36,14 47,14 38,21 42,32 32,25 22,32 26,21 17,14 28,14" fill="#e2a41f"/><path d="M32 20 12 46h14L8 58h48L38 46h14z" fill="#12804a"/><rect x="28" y="58" width="8" height="5" fill="#8a5a2b"/><circle cx="26" cy="40" r="2.6" fill="#d12c3a"/><circle cx="38" cy="48" r="2.6" fill="#e2a41f"/><circle cx="30" cy="52" r="2.2" fill="#d12c3a"/></svg>
   <h1>Wichtel-Werkstatt</h1>
-  <p>Wer beschenkt wen? Streng geheim ausgelost.</p>
+  <p>Wer beschenkt wen? Geheim, fair und in 30 Sekunden.</p>
+  <ol class="steps" id="steps"><li id="s1" class="on">Namen</li><li id="s2">Auslosen</li><li id="s3">Verschicken</li></ol>
 </header>
 
-<!-- Organisator -->
 <section id="setup">
   <div class="card" id="inputCard">
     <label for="nameIn">Wer wichtelt mit?</label>
-    <div class="addrow"><input type="text" id="nameIn" placeholder="Name eingeben …" maxlength="40" autocomplete="off" enterkeyhint="done"><button type="button" id="add">＋ Hinzufügen</button></div>
+    <div class="addrow"><input type="text" id="nameIn" placeholder="Name eingeben, Enter drücken" maxlength="40" autocomplete="off" enterkeyhint="done"><button type="button" id="add">Hinzufügen</button></div>
     <div class="chips" id="chips"></div>
-    <p class="hint" id="count">0 Teilnehmer · mindestens 3 nötig</p>
-    <div class="two">
-      <div><label for="budget">💶 Budget (optional)</label><input type="text" id="budget" placeholder="z. B. 20 €" maxlength="30" autocomplete="off"></div>
-      <div><label for="date">📅 Übergabe (optional)</label><input type="text" id="date" placeholder="z. B. 24.12. um 18 Uhr" maxlength="40" autocomplete="off"></div>
+    <p class="hint" id="count"></p>
+    <div class="grid">
+      <div><label for="budget">Budget (optional)</label><input type="text" id="budget" placeholder="z. B. 20 €" maxlength="30" autocomplete="off"></div>
+      <div><label for="date">Übergabe-Datum (optional)</label><input type="date" id="date"></div>
+      <div class="full"><label for="note">Hinweis oder Motto (optional)</label><input type="text" id="note" placeholder="z. B. 18 Uhr bei Oma · selbstgemacht" maxlength="60" autocomplete="off"></div>
     </div>
-    <button id="go">🎲 Auslosen</button>
+    <details id="exd"><summary>Paare ausschließen (optional)</summary>
+      <p class="hint">Diese Personen ziehen sich garantiert nicht gegenseitig, z. B. Partner.</p>
+      <div class="exrow"><select id="exA" aria-label="Person A"></select><select id="exB" aria-label="Person B"></select><button type="button" id="exAdd" class="ghost">Hinzufügen</button></div>
+      <div class="chips" id="exList"></div><p class="err" id="err2"></p>
+    </details>
+    <button id="go" class="big">Jetzt auslosen</button>
     <p class="err" id="err"></p>
   </div>
 
   <div class="card hide" id="resCard">
-    <h2 style="margin-top:0;color:var(--green)">✅ Ausgelost!</h2>
-    <div class="warn">🤫 Öffne die Links nicht selbst, außer deinen eigenen. Jeder Link verrät nur, wen <b>diese eine Person</b> beschenkt. Niemand sonst sieht etwas.</div>
-    <label for="base">Adresse dieser Seite</label>
-    <input type="text" id="base" autocomplete="off">
-    <p class="hint">Hier sollte die Adresse dieser Seite stehen. Die Links unten bauen darauf auf.</p>
+    <h2>Ausgelost! 🎉</h2>
+    <p class="hint">Schick jedem seinen persönlichen Link. Jeder Link verrät nur, wen diese eine Person beschenkt.</p>
+    <div class="warn">🤫 Öffne die Links der anderen nicht, sonst kennst du ihr Ergebnis. Am besten verschickst du sie einzeln und privat, nicht in einer Gruppe.</div>
     <div id="list"></div>
-    <p style="margin-bottom:0"><button id="copyAll" class="alt">📋 Alle Links kopieren</button> <button id="again" class="ghost">Neu auslosen</button></p>
+    <div class="acts2"><button id="copyAll" class="alt">Alle Links kopieren</button><button id="again" class="ghost">Neu auslosen</button></div>
   </div>
+  <details id="adv" class="hide-empty"><summary>Adresse dieser Seite</summary>
+    <p class="hint">Die Links bauen auf dieser Adresse auf. Sie wird automatisch erkannt.</p>
+    <input type="text" id="base" autocomplete="off" aria-label="Adresse dieser Seite">
+    <p class="warn hide" id="localwarn">Du testest die Seite lokal. Die Links funktionieren dann nur auf diesem Rechner. Für Familie und Freunde trägst du hier die Internetadresse ein, unter der die Seite online liegt (z. B. bei GitHub Pages).</p>
+  </details>
 </section>
 
-<!-- Teilnehmer -->
 <section id="reveal" class="hide">
-  <div class="card gift">
-    <p id="hello" style="font-size:1.2rem;margin-top:0"></p>
-    <div id="closed">
-      <button class="box" id="box" aria-label="Geschenk öffnen">🎁</button>
-      <p class="hint">Tippe auf das Geschenk, um zu sehen, wen du beschenkst.</p>
-    </div>
+  <div class="card stage">
+    <p id="hello" style="font-size:1.15rem;margin:0 0 10px;font-weight:600"></p>
+    <div id="closed"><button class="gift" id="box" aria-label="Geschenk öffnen">🎁</button><p class="hint">Tippe auf das Geschenk, um zu sehen, wen du beschenkst.</p></div>
     <div id="opened" class="hide">
-      <p style="margin:0">Du beschenkst:</p>
-      <div class="name" id="who"></div>
-      <div class="info hide" id="info"><div id="iB" class="hide">💶 Budget: <b id="iBv"></b></div><div id="iD" class="hide">📅 Übergabe: <b id="iDv"></b></div></div>
-      <p>🤫 Pssst! Verrate es niemandem.</p>
+      <p style="margin:0;color:var(--mute)">Du beschenkst</p>
+      <div class="who" id="who" aria-live="polite"></div>
+      <div id="after" class="hide">
+        <div class="facts" id="facts">
+          <div class="fact hide" id="fB"><small>Budget</small><b id="vB"></b></div>
+          <div class="fact hide" id="fD"><small>Übergabe</small><b id="vD"></b> <span class="count" id="vC"></span></div>
+          <div class="fact hide" id="fN"><small>Hinweis</small><b id="vN"></b></div>
+        </div>
+        <button id="ics" class="alt hide">In den Kalender eintragen</button>
+        <p class="hint">🤫 Pssst! Verrate es niemandem.</p>
+        <button id="hideIt" class="ghost">Wieder verstecken</button>
+      </div>
     </div>
-    <p class="err hide" id="bad">Dieser Link ist leider ungültig. Bitte frage den Organisator nach einem neuen Link.</p>
+    <p class="err hide" id="bad">Dieser Link ist leider ungültig. Bitte frag den Organisator nach einem neuen Link.</p>
   </div>
   <p style="text-align:center"><a href="#" id="own" class="hint">Eigene Wichtelrunde starten</a></p>
 </section>
+<p class="foot">Alle Namen werden nur in deinem Browser verarbeitet und nirgends gespeichert.</p>
 </main>
 <div class="toast hide" id="toast"></div>
 
 <script>
 (function(){
   var $=function(id){return document.getElementById(id)};
-  var SEP="\u0001", pairs=[];
-
-  /* Schneeflocken */
-  var s=$("snow");
-  for(var i=0;i<22;i++){var f=document.createElement("i");f.textContent=i%3?"❄":"✦";
-    f.style.left=Math.random()*100+"%";f.style.fontSize=(10+Math.random()*16)+"px";
-    f.style.animationDuration=(8+Math.random()*10)+"s";f.style.animationDelay=(-Math.random()*14)+"s";s.appendChild(f)}
-
-  function rnd(n){ /* gleichmäßige Zufallszahl 0..n-1 */
-    var max=Math.floor(4294967296/n)*n,a=new Uint32Array(1);
-    do{crypto.getRandomValues(a)}while(a[0]>=max);
-    return a[0]%n;
-  }
-  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t}return a}
-
-  var people=[],meta={b:"",d:""};
+  var SEP="\u0001",people=[],ex=[],pairs=[],cur=null,meta={b:"",d:"",n:""};
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e}
   function clean(x){return x.replace(/[\u0000-\u001f]/g,"").replace(/\s+/g," ").trim()}
+
+  /* Schnee */
+  for(var i=0;i<24;i++){var f=el("i","",i%3?"❄":"•");f.style.left=Math.random()*100+"%";f.style.fontSize=(9+Math.random()*15)+"px";
+    f.style.animationDuration=(9+Math.random()*10)+"s";f.style.animationDelay=(-Math.random()*16)+"s";$("snow").appendChild(f)}
+
+  function rnd(n){var max=Math.floor(4294967296/n)*n,a=new Uint32Array(1);do{crypto.getRandomValues(a)}while(a[0]>=max);return a[0]%n}
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t}return a}
+  function step(n){for(var i=1;i<=3;i++)$("s"+i).className=i===n?"on":""}
+
+  /* Namenskarten */
   function renderChips(){
     var c=$("chips");c.textContent="";
     people.forEach(function(n,i){
-      var e=document.createElement("div");e.className="chip";
-      var t=document.createElement("span");t.textContent="🎁 "+n;
-      var x=document.createElement("button");x.type="button";x.textContent="✕";x.setAttribute("aria-label",n+" entfernen");
+      var e=el("div","chip"),x=el("button","","✕");x.type="button";x.setAttribute("aria-label",n+" entfernen");
       x.onclick=function(){people.splice(i,1);$("err").textContent="";renderChips()};
-      e.appendChild(t);e.appendChild(x);c.appendChild(e);
-    });
-    var k=people.length;$("count").textContent=k+" Teilnehmer"+(k<3?" · mindestens 3 nötig":" · das passt ✔");
+      e.appendChild(el("span","","🎁 "+n));e.appendChild(x);c.appendChild(e)});
+    var k=people.length;$("count").textContent=k+" Teilnehmer"+(k<3?" · mindestens 3 nötig":" · bereit zum Auslosen");
+    ex=ex.filter(function(p){return people.indexOf(p[0])>-1&&people.indexOf(p[1])>-1});
+    ["exA","exB"].forEach(function(id){var s=$(id),old=s.value;s.textContent="";
+      people.forEach(function(n){var o=el("option","",n);o.value=n;s.appendChild(o)});if(people.indexOf(old)>-1)s.value=old});
+    renderEx();step(k>=3?2:1);
+  }
+  function renderEx(){
+    var c=$("exList");c.textContent="";
+    ex.forEach(function(p,i){var e=el("div","chip"),x=el("button","","✕");x.type="button";x.setAttribute("aria-label","Regel entfernen");
+      x.onclick=function(){ex.splice(i,1);renderEx()};e.appendChild(el("span","",p[0]+" ↔ "+p[1]));e.appendChild(x);c.appendChild(e)});
   }
   function addName(){
-    var inp=$("nameIn"),err=$("err"),n=clean(inp.value);err.textContent="";
+    var inp=$("nameIn"),n=clean(inp.value),err=$("err");err.textContent="";
     if(!n)return true;
     var l=n.toLowerCase();
-    for(var i=0;i<people.length;i++)if(people[i].toLowerCase()===l){
-      err.textContent="„"+n+"“ ist schon dabei. Bei gleichen Vornamen hilft z. B. „Anna M.“ und „Anna K.“.";return false}
+    for(var i=0;i<people.length;i++)if(people[i].toLowerCase()===l){err.textContent="„"+n+"“ ist schon dabei. Bei gleichen Vornamen hilft z. B. „Anna M.“ und „Anna K.“.";return false}
     if(people.length>=40){err.textContent="Mehr als 40 Teilnehmer sind leider nicht möglich.";return false}
     people.push(n);inp.value="";renderChips();inp.focus();return true;
   }
   $("add").onclick=function(){addName()};
   $("nameIn").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();addName()}});
-  renderChips();
+  $("exAdd").onclick=function(){
+    var a=$("exA").value,b=$("exB").value,e=$("err2");e.textContent="";
+    if(!a||!b||a===b){e.textContent="Bitte zwei verschiedene Personen wählen.";return}
+    for(var i=0;i<ex.length;i++)if((ex[i][0]===a&&ex[i][1]===b)||(ex[i][0]===b&&ex[i][1]===a)){e.textContent="Diese Regel gibt es schon.";return}
+    ex.push([a,b]);renderEx();
+  };
 
-  /* Token: Hex-Zeichen, damit der Link mit #name funktioniert */
+  /* Link-Token (nur Hex-Zeichen, damit #name funktioniert) */
   function hex(n){return ("0"+n.toString(16)).slice(-2)}
-  function enc(giver,recv){
-    var b=new TextEncoder().encode([giver,recv,meta.b,meta.d].join(SEP)),k=1+rnd(255),o=hex(k);
-    for(var i=0;i<b.length;i++)o+=hex(b[i]^k);
-    return o;
+  function enc(g,r){
+    var b=new TextEncoder().encode([g,r,meta.b,meta.d,meta.n].join(SEP)),k=1+rnd(255),o=hex(k);
+    for(var i=0;i<b.length;i++)o+=hex(b[i]^k);return o;
   }
   function dec(t){
     if(!/^([0-9a-f]{2}){3,}$/.test(t))return null;
     var k=parseInt(t.slice(0,2),16),b=[];
     for(var i=2;i<t.length;i+=2)b.push(parseInt(t.substr(i,2),16)^k);
     try{var p=new TextDecoder("utf-8",{fatal:true}).decode(new Uint8Array(b)).split(SEP);
-      return (p.length===2||p.length===4)&&p[0]&&p[1]?p:null}catch(e){return null}
+      return (p.length===2||p.length===4||p.length===5)&&p[0]&&p[1]?p:null}catch(e){return null}
   }
 
-  function draw(){
-    var err=$("err");err.textContent="";
-    if(!addName())return;
-    var names=people.slice();
-    if(names.length<3){err.textContent="Bitte mindestens 3 Teilnehmer hinzufügen.";return}
-    meta.b=clean($("budget").value);meta.d=clean($("date").value);
-    /* Zufälliger Ring: jeder beschenkt den Nächsten → niemand sich selbst, jeder genau einmal beschenkt */
-    var ring=shuffle(names);pairs=[];
-    for(var j=0;j<ring.length;j++)pairs.push({giver:ring[j],recv:ring[(j+1)%ring.length]});
-    pairs.sort(function(a,b){return a.giver.localeCompare(b.giver,"de")});
-    pairs.forEach(function(p){p.tok=enc(p.giver,p.recv)});
-    $("inputCard").classList.add("hide");$("resCard").classList.remove("hide");
-    renderList();
+  /* Auslosung: Zufallspermutation, niemand sich selbst, keine ausgeschlossenen Paare */
+  function plan(names){
+    var bad={};ex.forEach(function(p){bad[p[0]+SEP+p[1]]=1;bad[p[1]+SEP+p[0]]=1});
+    for(var t=0;t<20000;t++){
+      var s=shuffle(names),ok=true;
+      for(var i=0;i<names.length;i++)if(s[i]===names[i]||bad[names[i]+SEP+s[i]]){ok=false;break}
+      if(ok)return s;
+    }
+    return null;
   }
   function base(){return $("base").value.trim().replace(/#.*$/,"")}
   function link(p){return (base()||"HIER-ADRESSE-EINTRAGEN")+"#"+p.tok}
   function msg(p){return "🎅 Hallo "+p.giver+"! Hier erfährst du, wen du beim Wichteln beschenkst (psst, geheim halten!): "+link(p)}
 
+  function draw(){
+    var err=$("err");err.textContent="";
+    if(!addName())return;
+    if(people.length<3){err.textContent="Bitte mindestens 3 Teilnehmer hinzufügen.";return}
+    meta.b=clean($("budget").value);meta.n=clean($("note").value);
+    meta.d=/^\d{4}-\d{2}-\d{2}$/.test($("date").value)?$("date").value:"";
+    var s=plan(people);
+    if(!s){err.textContent="Mit diesen Regeln ist keine Auslosung möglich. Entferne eine Regel oder füge Teilnehmer hinzu.";return}
+    pairs=people.map(function(g,i){return {giver:g,recv:s[i]}});
+    pairs.sort(function(a,b){return a.giver.localeCompare(b.giver,"de")});
+    pairs.forEach(function(p){p.tok=enc(p.giver,p.recv)});
+    $("inputCard").classList.add("hide");$("resCard").classList.remove("hide");step(3);renderList();
+    $("resCard").scrollIntoView&&$("resCard").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  $("go").onclick=draw;
+
   function renderList(){
     var L=$("list");L.textContent="";
-    pairs.forEach(function(p,idx){
-      var r=document.createElement("div");r.className="row";
-      var n=document.createElement("b");n.textContent="🎁 "+p.giver;
-      var a=document.createElement("div");a.className="acts";
-      var c=document.createElement("button");c.textContent="Link kopieren";c.onclick=function(){copy(link(p),"Link für "+p.giver+" kopiert")};
-      var w=document.createElement("a");w.className="btn alt";w.textContent="WhatsApp";w.target="_blank";w.rel="noopener";
-      w.href="https://wa.me/?text="+encodeURIComponent(msg(p));
-      a.appendChild(c);a.appendChild(w);r.appendChild(n);r.appendChild(a);L.appendChild(r);
-    });
+    pairs.forEach(function(p){
+      var r=el("div","row"),a=el("div","acts");
+      if(navigator.share){var s=el("button","","Teilen");s.type="button";
+        s.onclick=function(){navigator.share({text:msg(p)}).catch(function(){})};a.appendChild(s)}
+      else{var w=el("a","btn","WhatsApp");w.target="_blank";w.rel="noopener";w.href="https://wa.me/?text="+encodeURIComponent(msg(p));a.appendChild(w)}
+      var c=el("button","ghost","Kopieren");c.type="button";c.onclick=function(){copy(link(p),"Link für "+p.giver+" kopiert")};a.appendChild(c);
+      r.appendChild(el("b","",p.giver));r.appendChild(a);L.appendChild(r)});
   }
   $("base").addEventListener("input",function(){if(pairs.length)renderList()});
-  $("copyAll").onclick=function(){
-    copy(pairs.map(function(p){return p.giver+": "+link(p)}).join("\n"),"Alle Links kopiert");
-  };
+  $("copyAll").onclick=function(){copy(pairs.map(function(p){return p.giver+": "+link(p)}).join("\n"),"Alle Links kopiert")};
   var armed=false;
   $("again").onclick=function(){
     var b=$("again");
     if(!armed){armed=true;b.textContent="Sicher? Alte Links werden ungültig – nochmal tippen";setTimeout(function(){armed=false;b.textContent="Neu auslosen"},4000);return}
-    armed=false;b.textContent="Neu auslosen";
-    pairs=[];$("resCard").classList.add("hide");$("inputCard").classList.remove("hide");
+    armed=false;b.textContent="Neu auslosen";pairs=[];
+    $("resCard").classList.add("hide");$("inputCard").classList.remove("hide");step(people.length>=3?2:1);
   };
-  $("go").onclick=draw;
 
   function toast(t){var e=$("toast");e.textContent=t;e.classList.remove("hide");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.add("hide")},2200)}
   function copy(text,ok){
-    function fb(){
-      var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
-      document.body.appendChild(ta);ta.select();var good=false;
-      try{good=document.execCommand("copy")}catch(e){}
-      document.body.removeChild(ta);
-      toast(good?ok:"Kopieren nicht möglich – bitte Link manuell markieren");
-    }
+    function fb(){var ta=document.createElement("textarea");ta.value=text;ta.style.cssText="position:fixed;opacity:0";
+      document.body.appendChild(ta);ta.select();var g=false;try{g=document.execCommand("copy")}catch(e){}
+      document.body.removeChild(ta);toast(g?ok:"Kopieren nicht möglich – bitte manuell markieren")}
     try{navigator.clipboard.writeText(text).then(function(){toast(ok)},fb)}catch(e){fb()}
   }
 
-  /* Ansicht wählen */
+  /* Teilnehmer-Ansicht */
+  var CH="ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyz",iv=null;
+  function isoOk(d){return /^\d{4}-\d{2}-\d{2}$/.test(d)}
+  function parts(d){var a=d.split("-");return new Date(+a[0],+a[1]-1,+a[2])}
+  function countdown(d){
+    var t=new Date();t=new Date(t.getFullYear(),t.getMonth(),t.getDate());
+    var n=Math.round((parts(d)-t)/864e5);
+    return n>1?"· noch "+n+" Tage":n===1?"· morgen!":n===0?"· heute!":"";
+  }
+  function showFacts(p){
+    var b=p[2]||"",d=p[3]||"",n=p[4]||"";
+    function set(f,v,txt){$(f).classList[txt?"remove":"add"]("hide");$(v).textContent=txt}
+    set("fB","vB",b);set("fN","vN",n);
+    var ok=isoOk(d);
+    set("fD","vD",d?(ok?parts(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}):d):"");
+    $("vC").textContent=ok?countdown(d):"";
+    $("ics").classList[ok?"remove":"add"]("hide");
+  }
+  function ics(){
+    var d=cur[3],s=parts(d),e=new Date(s.getFullYear(),s.getMonth(),s.getDate()+1);
+    function f(x){return x.getFullYear()+("0"+(x.getMonth()+1)).slice(-2)+("0"+x.getDate()).slice(-2)}
+    function q(t){return t.replace(/[\\;,]/g,"\\$&").replace(/\n/g,"\\n")}
+    var desc=[cur[2]?"Budget: "+cur[2]:"",cur[4]||""].filter(Boolean).join(" · ");
+    var txt=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Wichtel-Werkstatt//DE","BEGIN:VEVENT",
+      "UID:"+Date.now()+"@wichtel","DTSTAMP:"+new Date().toISOString().replace(/[-:]|\.\d+/g,""),
+      "DTSTART;VALUE=DATE:"+f(s),"DTEND;VALUE=DATE:"+f(e),"SUMMARY:"+q("Wichtel-Übergabe 🎁"),
+      "DESCRIPTION:"+q(desc),"END:VEVENT","END:VCALENDAR"].join("\r\n");
+    var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/calendar;charset=utf-8"}));
+    a.download="wichteln.ics";document.body.appendChild(a);a.click();document.body.removeChild(a);toast("Kalenderdatei erstellt");
+  }
+  $("ics").onclick=ics;
+
+  function openGift(){
+    if(!cur)return;
+    $("closed").classList.add("hide");$("opened").classList.remove("hide");$("after").classList.add("hide");
+    var chars=Array.from(cur[1]),t0=Date.now(),end=700+chars.length*110;
+    function done(){clearInterval(iv);$("who").textContent=cur[1];showFacts(cur);$("after").classList.remove("hide");
+      if(!reduce){confetti();try{navigator.vibrate&&navigator.vibrate([60,40,120])}catch(e){}}}
+    if(reduce){done();return}
+    clearInterval(iv);
+    iv=setInterval(function(){
+      var t=Date.now()-t0,o="";
+      chars.forEach(function(c,i){o+=(c===" "||t>=700+i*110)?c:CH[rnd(CH.length)]});
+      $("who").textContent=o;if(t>=end)done();
+    },55);
+  }
+  $("box").onclick=openGift;
+  $("hideIt").onclick=function(){clearInterval(iv);$("opened").classList.add("hide");$("closed").classList.remove("hide")};
+
+  /* Konfetti */
+  function confetti(){
+    var c=$("cf"),x=c.getContext&&c.getContext("2d");if(!x)return;
+    var w=c.width=innerWidth,h=c.height=innerHeight,cols=["#d12c3a","#12804a","#e2a41f","#fff","#ff8a5c","#55d68c"],P=[];
+    for(var i=0;i<150;i++)P.push({x:w/2+(Math.random()-.5)*w*.3,y:h*.45,vx:(Math.random()-.5)*14,vy:-6-Math.random()*13,s:5+Math.random()*7,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[i%cols.length]});
+    var t0=Date.now();
+    (function tick(){
+      x.clearRect(0,0,w,h);var alive=0;
+      P.forEach(function(p){p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+        if(p.y<h+20){alive++;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);x.restore()}});
+      if(alive&&Date.now()-t0<4500)requestAnimationFrame(tick);else x.clearRect(0,0,w,h);
+    })();
+  }
+
   function route(){
     var h=location.hash.replace(/^#/,"");
-    if(!h){$("setup").classList.remove("hide");$("reveal").classList.add("hide");return}
-    $("setup").classList.add("hide");$("reveal").classList.remove("hide");
-    var p=dec(h);
-    $("closed").classList.remove("hide");$("opened").classList.add("hide");
-    if(!p){$("hello").textContent="";$("closed").classList.add("hide");$("bad").classList.remove("hide");return}
-    $("bad").classList.add("hide");
-    $("hello").textContent="Frohe Weihnachten, "+p[0]+"! 🎄";
-    $("who").textContent=p[1];
-    var bb=p[2]||"",dd=p[3]||"";
-    $("iBv").textContent=bb;$("iDv").textContent=dd;
-    $("iB").classList[bb?"remove":"add"]("hide");$("iD").classList[dd?"remove":"add"]("hide");
-    $("info").classList[bb||dd?"remove":"add"]("hide");
+    clearInterval(iv);
+    if(!h){$("setup").classList.remove("hide");$("reveal").classList.add("hide");$("steps").classList.remove("hide");return}
+    $("setup").classList.add("hide");$("reveal").classList.remove("hide");$("steps").classList.add("hide");
+    cur=dec(h);
+    $("closed").classList.remove("hide");$("opened").classList.add("hide");$("bad").classList.add("hide");
+    if(!cur){$("hello").textContent="";$("closed").classList.add("hide");$("bad").classList.remove("hide");return}
+    $("hello").textContent="Frohe Weihnachten, "+cur[0]+"! 🎄";
   }
-  $("box").onclick=function(){$("closed").classList.add("hide");$("opened").classList.remove("hide")};
   $("own").onclick=function(e){e.preventDefault();location.hash="";route()};
   window.addEventListener("hashchange",route);
 
-  try{if(/^https?:/.test(location.href))$("base").value=location.href.replace(/#.*$/,"")}catch(e){}
-  route();
+  try{
+    if(/^(https?|file):/.test(location.href))$("base").value=location.href.replace(/[#?].*$/,"");
+    var loc=location.protocol==="file:";
+    if(loc)$("localwarn").classList.remove("hide");
+    if(loc||!$("base").value)$("adv").open=true;
+    var n=new Date();$("date").min=n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2);
+  }catch(e){}
+  renderChips();route();
 })();
 </script>
 </body>
