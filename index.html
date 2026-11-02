@@ -42,6 +42,15 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
 @keyframes wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
 .name{font-size:2.4rem;font-weight:bold;color:var(--green);word-break:break-word;margin:.2em 0;animation:pop .6s ease}
 @keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.addrow{display:flex;gap:8px}.addrow input{flex:1;min-width:0}.addrow button{white-space:nowrap;padding:10px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;min-height:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:2px solid var(--green);border-radius:999px;padding:4px 6px 4px 12px;font-weight:bold;animation:pop .3s ease;max-width:100%}
+.chip span{word-break:break-word}
+.chip button{background:var(--red);padding:0;width:24px;height:24px;line-height:22px;font-size:.9rem;flex:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.two label{font-size:.92rem}
+.info{margin:10px auto 4px;display:inline-block;text-align:left;background:rgba(201,150,43,.15);border-radius:12px;padding:8px 16px}
 .hide{display:none!important}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 18px;border-radius:999px;z-index:5;font-weight:bold}
 </style>
@@ -58,9 +67,14 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
 <!-- Organisator -->
 <section id="setup">
   <div class="card" id="inputCard">
-    <label for="names">Teilnehmer (ein Name pro Zeile)</label>
-    <textarea id="names" placeholder="Anna&#10;Ben&#10;Clara&#10;David"></textarea>
+    <label for="nameIn">Wer wichtelt mit?</label>
+    <div class="addrow"><input type="text" id="nameIn" placeholder="Name eingeben …" maxlength="40" autocomplete="off" enterkeyhint="done"><button type="button" id="add">＋ Hinzufügen</button></div>
+    <div class="chips" id="chips"></div>
     <p class="hint" id="count">0 Teilnehmer · mindestens 3 nötig</p>
+    <div class="two">
+      <div><label for="budget">💶 Budget (optional)</label><input type="text" id="budget" placeholder="z. B. 20 €" maxlength="30" autocomplete="off"></div>
+      <div><label for="date">📅 Übergabe (optional)</label><input type="text" id="date" placeholder="z. B. 24.12. um 18 Uhr" maxlength="40" autocomplete="off"></div>
+    </div>
     <button id="go">🎲 Auslosen</button>
     <p class="err" id="err"></p>
   </div>
@@ -70,7 +84,7 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
     <div class="warn">🤫 Öffne die Links nicht selbst, außer deinen eigenen. Jeder Link verrät nur, wen <b>diese eine Person</b> beschenkt. Niemand sonst sieht etwas.</div>
     <label for="base">Adresse dieser Seite</label>
     <input type="text" id="base" autocomplete="off">
-    <p class="hint">Wichtig: Teile diese Seite zuvor über „Teilen“ → Link, damit deine Mitwichtel sie öffnen können.</p>
+    <p class="hint">Hier sollte die Adresse dieser Seite stehen. Die Links unten bauen darauf auf.</p>
     <div id="list"></div>
     <p style="margin-bottom:0"><button id="copyAll" class="alt">📋 Alle Links kopieren</button> <button id="again" class="ghost">Neu auslosen</button></p>
   </div>
@@ -87,6 +101,7 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
     <div id="opened" class="hide">
       <p style="margin:0">Du beschenkst:</p>
       <div class="name" id="who"></div>
+      <div class="info hide" id="info"><div id="iB" class="hide">💶 Budget: <b id="iBv"></b></div><div id="iD" class="hide">📅 Übergabe: <b id="iDv"></b></div></div>
       <p>🤫 Pssst! Verrate es niemandem.</p>
     </div>
     <p class="err hide" id="bad">Dieser Link ist leider ungültig. Bitte frage den Organisator nach einem neuen Link.</p>
@@ -114,22 +129,36 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
   }
   function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t}return a}
 
-  function parse(){
-    var raw=$("names").value.split(/[\n;,]+/),out=[],seen={};
-    raw.forEach(function(x){
-      x=x.replace(/[\u0000-\u001f]/g,"").replace(/\s+/g," ").trim();
-      if(x)out.push(x);
+  var people=[],meta={b:"",d:""};
+  function clean(x){return x.replace(/[\u0000-\u001f]/g,"").replace(/\s+/g," ").trim()}
+  function renderChips(){
+    var c=$("chips");c.textContent="";
+    people.forEach(function(n,i){
+      var e=document.createElement("div");e.className="chip";
+      var t=document.createElement("span");t.textContent="🎁 "+n;
+      var x=document.createElement("button");x.type="button";x.textContent="✕";x.setAttribute("aria-label",n+" entfernen");
+      x.onclick=function(){people.splice(i,1);$("err").textContent="";renderChips()};
+      e.appendChild(t);e.appendChild(x);c.appendChild(e);
     });
-    return out;
+    var k=people.length;$("count").textContent=k+" Teilnehmer"+(k<3?" · mindestens 3 nötig":" · das passt ✔");
   }
-  $("names").addEventListener("input",function(){
-    var n=parse().length;$("count").textContent=n+" Teilnehmer"+(n<3?" · mindestens 3 nötig":"");
-  });
+  function addName(){
+    var inp=$("nameIn"),err=$("err"),n=clean(inp.value);err.textContent="";
+    if(!n)return true;
+    var l=n.toLowerCase();
+    for(var i=0;i<people.length;i++)if(people[i].toLowerCase()===l){
+      err.textContent="„"+n+"“ ist schon dabei. Bei gleichen Vornamen hilft z. B. „Anna M.“ und „Anna K.“.";return false}
+    if(people.length>=40){err.textContent="Mehr als 40 Teilnehmer sind leider nicht möglich.";return false}
+    people.push(n);inp.value="";renderChips();inp.focus();return true;
+  }
+  $("add").onclick=function(){addName()};
+  $("nameIn").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();addName()}});
+  renderChips();
 
   /* Token: Hex-Zeichen, damit der Link mit #name funktioniert */
   function hex(n){return ("0"+n.toString(16)).slice(-2)}
   function enc(giver,recv){
-    var b=new TextEncoder().encode(giver+SEP+recv),k=1+rnd(255),o=hex(k);
+    var b=new TextEncoder().encode([giver,recv,meta.b,meta.d].join(SEP)),k=1+rnd(255),o=hex(k);
     for(var i=0;i<b.length;i++)o+=hex(b[i]^k);
     return o;
   }
@@ -138,16 +167,15 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
     var k=parseInt(t.slice(0,2),16),b=[];
     for(var i=2;i<t.length;i+=2)b.push(parseInt(t.substr(i,2),16)^k);
     try{var p=new TextDecoder("utf-8",{fatal:true}).decode(new Uint8Array(b)).split(SEP);
-      return p.length===2&&p[0]&&p[1]?p:null}catch(e){return null}
+      return (p.length===2||p.length===4)&&p[0]&&p[1]?p:null}catch(e){return null}
   }
 
   function draw(){
-    var names=parse(),err=$("err");err.textContent="";
-    if(names.length<3){err.textContent="Bitte mindestens 3 Teilnehmer eintragen.";return}
-    var low={};
-    for(var i=0;i<names.length;i++){var l=names[i].toLowerCase();
-      if(low[l]){err.textContent="„"+names[i]+"“ kommt doppelt vor. Bitte unterscheide die Namen (z. B. „Anna M.“ und „Anna K.“).";return}
-      low[l]=1}
+    var err=$("err");err.textContent="";
+    if(!addName())return;
+    var names=people.slice();
+    if(names.length<3){err.textContent="Bitte mindestens 3 Teilnehmer hinzufügen.";return}
+    meta.b=clean($("budget").value);meta.d=clean($("date").value);
     /* Zufälliger Ring: jeder beschenkt den Nächsten → niemand sich selbst, jeder genau einmal beschenkt */
     var ring=shuffle(names);pairs=[];
     for(var j=0;j<ring.length;j++)pairs.push({giver:ring[j],recv:ring[(j+1)%ring.length]});
@@ -208,6 +236,10 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
     $("bad").classList.add("hide");
     $("hello").textContent="Frohe Weihnachten, "+p[0]+"! 🎄";
     $("who").textContent=p[1];
+    var bb=p[2]||"",dd=p[3]||"";
+    $("iBv").textContent=bb;$("iDv").textContent=dd;
+    $("iB").classList[bb?"remove":"add"]("hide");$("iD").classList[dd?"remove":"add"]("hide");
+    $("info").classList[bb||dd?"remove":"add"]("hide");
   }
   $("box").onclick=function(){$("closed").classList.add("hide");$("opened").classList.remove("hide")};
   $("own").onclick=function(e){e.preventDefault();location.hash="";route()};
