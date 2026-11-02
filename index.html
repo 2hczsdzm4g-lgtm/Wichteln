@@ -157,7 +157,7 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
     renderList();
   }
   function base(){return $("base").value.trim().replace(/#.*$/,"")}
-  function link(p){return base()+"#"+p.tok}
+  function link(p){return (base()||"HIER-ADRESSE-EINTRAGEN")+"#"+p.tok}
   function msg(p){return "🎅 Hallo "+p.giver+"! Hier erfährst du, wen du beim Wichteln beschenkst (psst, geheim halten!): "+link(p)}
 
   function renderList(){
@@ -176,7 +176,13 @@ button.ghost{background:transparent;color:var(--red);border:2px solid var(--red)
   $("copyAll").onclick=function(){
     copy(pairs.map(function(p){return p.giver+": "+link(p)}).join("\n"),"Alle Links kopiert");
   };
-  $("again").onclick=function(){pairs=[];$("resCard").classList.add("hide");$("inputCard").classList.remove("hide")};
+  var armed=false;
+  $("again").onclick=function(){
+    var b=$("again");
+    if(!armed){armed=true;b.textContent="Sicher? Alte Links werden ungültig – nochmal tippen";setTimeout(function(){armed=false;b.textContent="Neu auslosen"},4000);return}
+    armed=false;b.textContent="Neu auslosen";
+    pairs=[];$("resCard").classList.add("hide");$("inputCard").classList.remove("hide");
+  };
   $("go").onclick=draw;
 
   function toast(t){var e=$("toast");e.textContent=t;e.classList.remove("hide");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.add("hide")},2200)}
